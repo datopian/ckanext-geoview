@@ -80,18 +80,9 @@
         baseLayer = L.tileLayer.provider(mapConfig.type, mapConfig)
 
       } else {
-        let c = L.Control.extend({
-
-          onAdd: (map) => {
-            let element = document.createElement("div");
-            element.className = "leaflet-control-no-provider";
-            element.innerHTML = 'No map provider set. Please check the <a href="https://docs.ckan.org/projects/ckanext-spatial/en/latest/map-widgets.html">documentation</a>';
-            return element;
-          },
-          onRemove: (map) => {}
-        })
-        map.addControl(new c({position: "bottomleft"}))
-
+        baseLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        });
       }
 
       if (baseLayer) {
