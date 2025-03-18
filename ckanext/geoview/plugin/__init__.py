@@ -67,6 +67,7 @@ class OLGeoView(GeoViewMixin, GeoViewBase):
         "arcgis_rest",
         "wmts",
         "esri rest",
+        "tiff"
     ]
 
     # ITemplateHelpers

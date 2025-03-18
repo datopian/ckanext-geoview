@@ -1,7 +1,7 @@
 /* global ckan, OL_HELPERS, ol, $, preload_resource */
 // Openlayers preview module
 
-(function() {
+(function () {
 
     if (window.Proj4js) {
         // add your projection definitions here
@@ -15,7 +15,7 @@
 
         ckan.geoview = ckan.geoview || {}
 
-        var esrirestExtractor = function(resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
+        var esrirestExtractor = function (resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
             var parsedUrl = resource.url.split('#');
             var url = proxyServiceUrl || parsedUrl[0];
 
@@ -38,14 +38,14 @@
                 var url = proxyUrl || resource.url;
                 layerProcessor(OL_HELPERS.createGeoJSONLayer(url));
             },
-            'wfs': function(resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
+            'wfs': function (resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
                 var parsedUrl = resource.url.split('#');
                 var url = proxyServiceUrl || parsedUrl[0];
 
                 var ftName = parsedUrl.length > 1 && parsedUrl[1];
                 OL_HELPERS.withFeatureTypesLayers(url, layerProcessor, ftName, map, true /* useGET */);
             },
-            'wms' : function(resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
+            'wms': function (resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
                 var parsedUrl = resource.url.split('#');
                 // use the original URL for the getMap, as there's no need for a proxy for image requests
                 var getMapUrl = parsedUrl[0];
@@ -53,9 +53,9 @@
                 var url = proxyServiceUrl || getMapUrl;
 
                 var layerName = parsedUrl.length > 1 && parsedUrl[1];
-                OL_HELPERS.withWMSLayers(url, getMapUrl, layerProcessor, layerName, true /* useTiling*/, map );
+                OL_HELPERS.withWMSLayers(url, getMapUrl, layerProcessor, layerName, true /* useTiling*/, map);
             },
-            'wmts' : function(resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
+            'wmts': function (resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
                 var parsedUrl = resource.url.split('#');
 
                 var url = proxyServiceUrl || parsedUrl[0];
@@ -67,11 +67,31 @@
                 var url = proxyUrl || resource.url;
                 layerProcessor(OL_HELPERS.createEsriGeoJSONLayer(url));
             },
-            'arcgis_rest': esrirestExtractor ,
-            'esri rest': esrirestExtractor ,
+            'arcgis_rest': esrirestExtractor,
+            'esri rest': esrirestExtractor,
             'gft': function (resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
                 var tableId = OL_HELPERS.parseURL(resource.url).query.docid;
                 layerProcessor(OL_HELPERS.createGFTLayer(tableId, ckan.geoview.gapi_key));
+            },
+            'tiff': function (resource, proxyUrl, proxyServiceUrl, layerProcessor, map) {
+                var url = proxyUrl || resource.url;
+
+                var source = new ol.source.GeoTIFF({
+                    sources: [
+                        {
+                            url: url
+                        }
+                    ]
+                });
+
+
+                var geoTiffLayer = new ol.layer.Image({
+                    source: source,
+                    visible: true   
+                });
+                
+
+                layerProcessor(geoTiffLayer);
             }
         }
 
@@ -94,7 +114,7 @@
 
             addLayer: function (resourceLayer) {
                 if (resourceLayer.setStyle) {
-                  resourceLayer.setStyle(this.defaultStyle);
+                    resourceLayer.setStyle(this.defaultStyle);
                 }
 
                 if (this.options.ol_config.hide_overlays &&
@@ -105,19 +125,19 @@
                 this.map.addLayerWithExtent(resourceLayer);
             },
 
-            _commonBaseLayer: function(mapConfig, callback, module) {
+            _commonBaseLayer: function (mapConfig, callback, module) {
 
                 if (mapConfig.type == 'mapbox') {
                     // MapBox base map
                     if (!mapConfig['map_id'] || !mapConfig['access_token']) {
-                      throw '[CKAN Map Widgets] You need to provide a map ID ([account].[handle]) and an access token when using a MapBox layer. ' +
-                            'See http://www.mapbox.com/developers/api-overview/ for details';
+                        throw '[CKAN Map Widgets] You need to provide a map ID ([account].[handle]) and an access token when using a MapBox layer. ' +
+                        'See http://www.mapbox.com/developers/api-overview/ for details';
                     }
 
                     mapConfig.url = ['//a.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
-                                '//b.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
-                                '//c.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
-                                '//d.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
+                    '//b.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
+                    '//c.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
+                    '//d.tiles.mapbox.com/v4/' + mapConfig['map_id'] + '/${z}/${x}/${y}.png?access_token=' + mapConfig['access_token'],
                     ];
                     mapConfig.attribution = '<a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox &copy; OpenStreetMap </a> <a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>';
 
@@ -149,9 +169,9 @@
                 this.highlightStyle = styleMapJson.highlight || undefined;
 
 
-                var coordinateFormatter = function(coordinate) {
+                var coordinateFormatter = function (coordinate) {
                     var degrees = map && map.getView() && map.getView().getProjection() && (map.getView().getProjection().getUnits() == 'degrees')
-                    return ol.coordinate.toStringXY(coordinate, degrees ? 5:2);
+                    return ol.coordinate.toStringXY(coordinate, degrees ? 5 : 2);
                 };
 
                 const baseMapLayer = baseMapLayerList[0];
@@ -161,13 +181,13 @@
                     layers: baseMapLayerList,
                     controls: [
                         new ol.control.ZoomSlider(),
-                        new ol.control.MousePosition( {
+                        new ol.control.MousePosition({
                             coordinateFormat: coordinateFormatter,
                         }),
                         layerSwitcher
                     ],
                     loadingDiv: false,
-                    loadingListener: function(isLoading) {
+                    loadingListener: function (isLoading) {
                         layerSwitcher.isLoading(isLoading);
                     },
                     overlays: overlays,
@@ -183,8 +203,8 @@
                 var map = this.map = new OL_HELPERS.LoggingMap(options);
                 // by default stretch the map to the basemap extent or to the world
                 map.getView().fit(
-                        baseMapLayer.getExtent() || ol.proj.transformExtent(OL_HELPERS.WORLD_BBOX, OL_HELPERS.EPSG4326, map.getView().getProjection()),
-                    {constrainResolution: false}
+                    baseMapLayer.getExtent() || ol.proj.transformExtent(OL_HELPERS.WORLD_BBOX, OL_HELPERS.EPSG4326, map.getView().getProjection()),
+                    { constrainResolution: false }
                 );
 
                 map.highlightStyle = this.highlightStyle;
@@ -203,15 +223,15 @@
                 });
 
                 // force a reload of all vector sources on projection change
-                map.getView().on('change:projection', function() {
-                    map.getLayers().forEach(function(layer) {
+                map.getView().on('change:projection', function () {
+                    map.getLayers().forEach(function (layer) {
                         if (layer instanceof ol.layer.Vector) {
                             layer.getSource().clear();
                         }
                     });
                 });
-                map.on('change:view', function() {
-                    map.getLayers().forEach(function(layer) {
+                map.on('change:view', function () {
+                    map.getLayers().forEach(function (layer) {
                         if (layer instanceof ol.layer.Vector) {
                             layer.getSource().clear();
                         }
@@ -288,7 +308,7 @@
                     overlays.push(new OL_HELPERS.FeatureInfoOverlay({
                         element: $("<div class='popupContainer'><div class='popupContent'></div></div>")[0],
                         autoPan: false,
-                        offset: [5,5]
+                        offset: [5, 5]
                     }))
 
 
@@ -300,9 +320,10 @@
                 if (!baseMapsConfig) {
                     // deprecated - for backward comp, parse old config format into json config
                     var config = {
-                        type: this.options.map_config['type']
+                        type: this.options.map_config['type'],
+                        url: this.options.map_config['url'],
                     }
-                    var prefix = config.type+'.'
+                    var prefix = config.type + '.'
                     for (var fieldName in this.options.map_config) {
                         if (fieldName.startsWith(prefix)) config[fieldName.substring(prefix.length)] = this.options.map_config[fieldName]
                     }
@@ -311,18 +332,18 @@
 
                 this._commonBaseLayer(
                     baseMapsConfig[0],
-                    function(layer) {
+                    function (layer) {
                         baseMapsConfig[0].$ol_layer = layer;
                         $this.createMapFun(layer, overlays);
 
                         // add all configured basemap layers
                         if (baseMapsConfig.length > 1) {
                             // add other basemaps if any
-                            for (var idx=1;idx<baseMapsConfig.length;idx++) {
+                            for (var idx = 1; idx < baseMapsConfig.length; idx++) {
                                 OL_HELPERS.createLayerFromConfig(
                                     baseMapsConfig[idx],
                                     true,
-                                    function(layer) {
+                                    function (layer) {
                                         layer.setVisible(false)
                                         // insert all basemaps at the bottom
                                         $this.map.getLayers().insertAt(0, layer)

@@ -22,7 +22,7 @@ ckan.module('shppreview', function (jQuery, _) {
       self.map = ckan.commonLeafletMap('map', this.options.map_config, {attributionControl: false});
 
       // hack to make leaflet use a particular location to look for images
-      L.Icon.Default.imagePath = this.options.site_url + 'js/vendor/leaflet/dist/images';
+      L.Icon.Default.imagePath = this.options.site_url + 'js/vendor/leaflet/images/';
 
       jQuery.get(preload_resource['url']).done(
         function(data){
